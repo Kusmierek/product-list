@@ -1,0 +1,15 @@
+<td class="px-6 py-4 text-xs text-slate-300 font-mono">{{ index() + 1 }}</td>
+<td class="px-6 py-4">
+  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700 font-mono tracking-wide">
+    {{ product().code }}
+  </span>
+</td>
+<td class="px-6 py-4">
+  <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
+    {{ product().name }}
+  </span>
+</td>
+<td class="px-6 py-4 text-right">
+  <span class="text-sm font-bold text-emerald-600">{{ product().price | number:'1.2-2' }}</span>
+  <span class="text-xs text-slate-400 ml-1">PLN</span>
+</td>
