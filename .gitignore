@@ -1,0 +1,15 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Angular
+product-catalog-app/node_modules/
+product-catalog-app/dist/
+product-catalog-app/.angular/
+
+# General
+.DS_Store
+Thumbs.db
