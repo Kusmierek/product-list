@@ -14,6 +14,9 @@ public class InMemoryProductRepository : IProductRepository
     public Task<IEnumerable<Product>> GetAllAsync(CancellationToken ct = default) =>
         Task.FromResult<IEnumerable<Product>>(_products.AsReadOnly());
 
+    public Task<bool> ExistsAsync(string code, CancellationToken ct = default) =>
+        Task.FromResult(_products.Any(p => p.Code == code));
+
     public Task<Product> AddAsync(Product product, CancellationToken ct = default)
     {
         _products.Add(product);

@@ -4,16 +4,18 @@ using ProductCatalog.API.Repositories;
 
 namespace ProductCatalog.API.Services;
 
-public class ProductService(IProductRepository repo) : IProductService
+public class ProductService(IProductRepository repo, ILogger<ProductService> logger) : IProductService
 {
     public Task<IEnumerable<Product>> GetAllAsync(CancellationToken ct = default) =>
         repo.GetAllAsync(ct);
 
     public async Task<Product> CreateAsync(CreateProductDto dto, CancellationToken ct = default)
     {
-        var existing = await repo.GetAllAsync(ct);
-        if (existing.Any(p => p.Code == dto.Code))
+        if (await repo.ExistsAsync(dto.Code, ct))
+        {
+            logger.LogWarning("Attempt to create product with duplicate code {Code}", dto.Code);
             throw new ProductCodeAlreadyExistsException(dto.Code);
+        }
 
         var product = new Product
         {
@@ -22,6 +24,8 @@ public class ProductService(IProductRepository repo) : IProductService
             Price = dto.Price
         };
 
-        return await repo.AddAsync(product, ct);
+        var created = await repo.AddAsync(product, ct);
+        logger.LogInformation("Product created with Id {Id} and Code {Code}", created.Id, created.Code);
+        return created;
     }
 }

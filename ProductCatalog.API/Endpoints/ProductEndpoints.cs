@@ -14,11 +14,21 @@ public static class ProductEndpoints
         group.MapGet("/", async (IProductService service, CancellationToken ct) =>
             await service.GetAllAsync(ct));
 
-        group.MapPost("/", async (IValidator<CreateProductDto> validator, CreateProductDto dto, IProductService service, CancellationToken ct) =>
+        group.MapPost("/", async (
+            IValidator<CreateProductDto> validator,
+            CreateProductDto dto,
+            IProductService service,
+            ILogger<ProductEndpoints> logger,
+            CancellationToken ct) =>
         {
             var validationResult = await validator.ValidateAsync(dto, ct);
+            
             if (!validationResult.IsValid)
+            {
+                logger.LogWarning("Validation failed for CreateProduct: {Errors}",
+                    string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
                 return Results.ValidationProblem(validationResult.ToDictionary());
+            }
 
             try
             {
