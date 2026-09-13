@@ -1,3 +1,4 @@
+using FluentValidation;
 using ProductCatalog.API.Models;
 using ProductCatalog.API.Repositories;
 
@@ -11,8 +12,12 @@ public static class ProductEndpoints
 
         group.MapGet("/", (IProductRepository repo) => repo.GetAll());
 
-        group.MapPost("/", (CreateProductDto dto, IProductRepository repo) =>
+        group.MapPost("/", async (IValidator<CreateProductDto> validator, CreateProductDto dto, IProductRepository repo, CancellationToken ct) =>
         {
+            var validationResult = await validator.ValidateAsync(dto, ct);
+            if (!validationResult.IsValid)
+                return Results.ValidationProblem(validationResult.ToDictionary());
+
             var product = new Product
             {
                 Code = dto.Code,
@@ -21,6 +26,6 @@ public static class ProductEndpoints
             };
             var created = repo.Add(product);
             return Results.Created($"/api/products/{created.Id}", created);
-        });
+        }).RequireRateLimiting("create-product");
     }
 }
