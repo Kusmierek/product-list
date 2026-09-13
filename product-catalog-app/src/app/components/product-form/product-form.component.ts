@@ -1,15 +1,15 @@
 import { Component, output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
+import { NgIcon } from '@ng-icons/core';
 import { ProductService } from '../../services/product.service';
 import { CreateProductDto } from '../../models/product.model';
 
 @Component({
   selector: 'app-product-form',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NgIcon],
   templateUrl: './product-form.component.html',
-  styleUrl: './product-form.component.css'
+  styleUrl: './product-form.component.css',
 })
 export class ProductFormComponent {
   readonly productAdded = output<void>();
@@ -37,7 +37,7 @@ export class ProductFormComponent {
       error: () => {
         this.errorMessage.set('Failed to add product. Is the API running?');
         this.submitting.set(false);
-      }
+      },
     });
   }
 }

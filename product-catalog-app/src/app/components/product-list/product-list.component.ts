@@ -1,5 +1,6 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgIcon } from '@ng-icons/core';
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
 import { ProductRowComponent } from '../product-row/product-row.component';
@@ -7,7 +8,7 @@ import { ProductRowComponent } from '../product-row/product-row.component';
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, ProductRowComponent],
+  imports: [CommonModule, ProductRowComponent, NgIcon],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.css',
 })
@@ -35,6 +36,5 @@ export class ProductListComponent {
         this.loading.set(false);
       },
     });
-    console.log(this.products);
   }
 }
