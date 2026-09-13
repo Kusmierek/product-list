@@ -11,8 +11,8 @@ public static class ProductEndpoints
     {
         var group = app.MapGroup("/api/products");
 
-        group.MapGet("/", async (IProductService service, CancellationToken ct) =>
-            await service.GetAllAsync(ct));
+        group.MapGet("/", async ([AsParameters] ProductQuery query, IProductService service, CancellationToken ct) =>
+            await service.GetAllAsync(query, ct));
 
         group.MapPost("/", async (
             IValidator<CreateProductDto> validator,

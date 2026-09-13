@@ -6,8 +6,8 @@ namespace ProductCatalog.API.Services;
 
 public class ProductService(IProductRepository repo, ILogger<ProductService> logger) : IProductService
 {
-    public Task<IEnumerable<Product>> GetAllAsync(CancellationToken ct = default) =>
-        repo.GetAllAsync(ct);
+    public Task<PagedResult<Product>> GetAllAsync(ProductQuery query, CancellationToken ct = default) =>
+        repo.GetAllAsync(query, ct);
 
     public async Task<Product> CreateAsync(CreateProductDto dto, CancellationToken ct = default)
     {

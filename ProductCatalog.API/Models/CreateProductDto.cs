@@ -1,10 +1,8 @@
 namespace ProductCatalog.API.Models;
 
-public class Product
+public class CreateProductDto
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
     public string Code { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public decimal Price { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
