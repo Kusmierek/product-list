@@ -11,24 +11,29 @@ public static class ProductEndpoints
     {
         var group = app.MapGroup("/api/products");
 
-        group.MapGet("/", async ([AsParameters] ProductQuery query, IProductService service, CancellationToken ct) =>
-            await service.GetAllAsync(query, ct));
+        group.MapGet("/", async (
+            IProductService service,
+            CancellationToken ct,
+            int page = 1,
+            int pageSize = 10,
+            ProductSortBy sortBy = ProductSortBy.CreatedAt,
+            SortDirection sortDir = SortDirection.Desc,
+            string? search = null) =>
+        {
+            var query = new ProductQuery { Page = page, PageSize = pageSize, SortBy = sortBy, SortDir = sortDir, Search = search };
+            return await service.GetAllAsync(query, ct);
+        });
 
         group.MapPost("/", async (
             IValidator<CreateProductDto> validator,
             CreateProductDto dto,
             IProductService service,
-            ILogger<ProductEndpoints> logger,
             CancellationToken ct) =>
         {
             var validationResult = await validator.ValidateAsync(dto, ct);
-            
+
             if (!validationResult.IsValid)
-            {
-                logger.LogWarning("Validation failed for CreateProduct: {Errors}",
-                    string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
                 return Results.ValidationProblem(validationResult.ToDictionary());
-            }
 
             try
             {

@@ -36,7 +36,7 @@ public class InMemoryProductRepository : IProductRepository
         };
 
         var total = items.Count();
-        var paged = items.Skip((query.Page - 1) * query.PageSize).Take(query.PageSize);a c
+        var paged = items.Skip((query.Page - 1) * query.PageSize).Take(query.PageSize);
 
         return Task.FromResult(new PagedResult<Product>
         {
