@@ -11,11 +11,12 @@ public class InMemoryProductRepository : IProductRepository
         new Product { Code = "P003", Name = "Mechanical Keyboard", Price = 349.00m }
     };
 
-    public IEnumerable<Product> GetAll() => _products.AsReadOnly();
+    public Task<IEnumerable<Product>> GetAllAsync(CancellationToken ct = default) =>
+        Task.FromResult<IEnumerable<Product>>(_products.AsReadOnly());
 
-    public Product Add(Product product)
+    public Task<Product> AddAsync(Product product, CancellationToken ct = default)
     {
         _products.Add(product);
-        return product;
+        return Task.FromResult(product);
     }
 }

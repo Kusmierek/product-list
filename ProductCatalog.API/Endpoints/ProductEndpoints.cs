@@ -10,7 +10,8 @@ public static class ProductEndpoints
     {
         var group = app.MapGroup("/api/products");
 
-        group.MapGet("/", (IProductRepository repo) => repo.GetAll());
+        group.MapGet("/", async (IProductRepository repo, CancellationToken ct) =>
+            await repo.GetAllAsync(ct));
 
         group.MapPost("/", async (IValidator<CreateProductDto> validator, CreateProductDto dto, IProductRepository repo, CancellationToken ct) =>
         {
@@ -24,7 +25,7 @@ public static class ProductEndpoints
                 Name = dto.Name,
                 Price = dto.Price
             };
-            var created = repo.Add(product);
+            var created = await repo.AddAsync(product, ct);
             return Results.Created($"/api/products/{created.Id}", created);
         }).RequireRateLimiting("create-product");
     }

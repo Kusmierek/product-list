@@ -4,6 +4,6 @@ namespace ProductCatalog.API.Repositories;
 
 public interface IProductRepository
 {
-    IEnumerable<Product> GetAll();
-    Product Add(Product product);
+    Task<IEnumerable<Product>> GetAllAsync(CancellationToken ct = default);
+    Task<Product> AddAsync(Product product, CancellationToken ct = default);
 }

@@ -11,7 +11,11 @@ public class CreateProductDtoValidator : AbstractValidator<CreateProductDto>
         RuleFor(x => x.Code)
             .NotEmpty()
             .MaximumLength(50)
-            .Must(code => !repo.GetAll().Any(p => p.Code == code))
+            .MustAsync(async (code, ct) =>
+            {
+                var products = await repo.GetAllAsync(ct);
+                return !products.Any(p => p.Code == code);
+            })
             .WithMessage("Product with this code already exists.");
 
         RuleFor(x => x.Name)
