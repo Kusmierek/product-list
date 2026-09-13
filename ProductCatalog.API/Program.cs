@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using ProductCatalog.API.Endpoints;
 using ProductCatalog.API.Models;
 using ProductCatalog.API.Repositories;
+using ProductCatalog.API.Services;
 using ProductCatalog.API.Validators;
 using System.Threading.RateLimiting;
 
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddProblemDetails();
 builder.Services.AddSingleton<IProductRepository, InMemoryProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IValidator<CreateProductDto>, CreateProductDtoValidator>();
 
 builder.Services.AddRateLimiter(options =>

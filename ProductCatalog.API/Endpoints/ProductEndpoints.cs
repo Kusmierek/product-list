@@ -1,6 +1,7 @@
 using FluentValidation;
+using ProductCatalog.API.Exceptions;
 using ProductCatalog.API.Models;
-using ProductCatalog.API.Repositories;
+using ProductCatalog.API.Services;
 
 namespace ProductCatalog.API.Endpoints;
 
@@ -10,23 +11,24 @@ public static class ProductEndpoints
     {
         var group = app.MapGroup("/api/products");
 
-        group.MapGet("/", async (IProductRepository repo, CancellationToken ct) =>
-            await repo.GetAllAsync(ct));
+        group.MapGet("/", async (IProductService service, CancellationToken ct) =>
+            await service.GetAllAsync(ct));
 
-        group.MapPost("/", async (IValidator<CreateProductDto> validator, CreateProductDto dto, IProductRepository repo, CancellationToken ct) =>
+        group.MapPost("/", async (IValidator<CreateProductDto> validator, CreateProductDto dto, IProductService service, CancellationToken ct) =>
         {
             var validationResult = await validator.ValidateAsync(dto, ct);
             if (!validationResult.IsValid)
                 return Results.ValidationProblem(validationResult.ToDictionary());
 
-            var product = new Product
+            try
             {
-                Code = dto.Code,
-                Name = dto.Name,
-                Price = dto.Price
-            };
-            var created = await repo.AddAsync(product, ct);
-            return Results.Created($"/api/products/{created.Id}", created);
+                var created = await service.CreateAsync(dto, ct);
+                return Results.Created($"/api/products/{created.Id}", created);
+            }
+            catch (ProductCodeAlreadyExistsException ex)
+            {
+                return Results.Conflict(new { error = ex.Message });
+            }
         }).RequireRateLimiting("create-product");
     }
 }
