@@ -9,7 +9,7 @@ public class CreateProductDtoValidator : AbstractValidator<CreateProductDto>
     {
         RuleFor(x => x.Code)
             .NotEmpty()
-            .MaximumLength(50);
+            .MaximumLength(6);
 
         RuleFor(x => x.Name)
             .NotEmpty()

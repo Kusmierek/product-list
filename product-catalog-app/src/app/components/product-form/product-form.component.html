@@ -29,16 +29,23 @@
           [(ngModel)]="model.code"
           required
           placeholder="e.g. P001"
+          maxlength="6"
           #codeInput="ngModel"
           class="w-full pl-9 pr-3 py-2.5 text-sm border rounded-xl outline-none transition-all duration-150 text-slate-700 placeholder-slate-300 border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
           [class.border-red-300]="codeInput.invalid && codeInput.touched"
           [class.bg-red-50]="codeInput.invalid && codeInput.touched"
         />
       </div>
-      @if (codeInput.invalid && codeInput.touched) {
+      @if (codeInput.touched && codeInput.errors?.['required']) {
         <p class="mt-1 text-xs text-red-500 flex items-center gap-1">
           <ng-icon name="heroExclamationCircle" size="12" />
           Code is required.
+        </p>
+      }
+      @if (codeInput.touched && codeInput.errors?.['maxlength']) {
+        <p class="mt-1 text-xs text-red-500 flex items-center gap-1">
+          <ng-icon name="heroExclamationCircle" size="12" />
+          Code must be at most 6 characters.
         </p>
       }
     </div>
@@ -60,16 +67,23 @@
           [(ngModel)]="model.name"
           required
           placeholder="e.g. Laptop Pro 15"
+          maxlength="100"
           #nameInput="ngModel"
           class="w-full pl-9 pr-3 py-2.5 text-sm border rounded-xl outline-none transition-all duration-150 text-slate-700 placeholder-slate-300 border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
           [class.border-red-300]="nameInput.invalid && nameInput.touched"
           [class.bg-red-50]="nameInput.invalid && nameInput.touched"
         />
       </div>
-      @if (nameInput.invalid && nameInput.touched) {
+      @if (nameInput.touched && nameInput.errors?.['required']) {
         <p class="mt-1 text-xs text-red-500 flex items-center gap-1">
           <ng-icon name="heroExclamationCircle" size="12" />
           Name is required.
+        </p>
+      }
+      @if (nameInput.touched && nameInput.errors?.['maxlength']) {
+        <p class="mt-1 text-xs text-red-500 flex items-center gap-1">
+          <ng-icon name="heroExclamationCircle" size="12" />
+          Name must be at most 100 characters.
         </p>
       }
     </div>
@@ -94,46 +108,59 @@
           min="0.01"
           step="0.01"
           placeholder="0.00"
+          max="999999.99"
           #priceInput="ngModel"
           class="w-full pl-12 pr-3 py-2.5 text-sm border rounded-xl outline-none transition-all duration-150 text-slate-700 placeholder-slate-300 border-slate-200 bg-slate-50 focus:bg-white focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
           [class.border-red-300]="priceInput.invalid && priceInput.touched"
           [class.bg-red-50]="priceInput.invalid && priceInput.touched"
         />
       </div>
-      @if (priceInput.invalid && priceInput.touched) {
+      @if (priceInput.touched && priceInput.errors?.['required']) {
         <p class="mt-1 text-xs text-red-500 flex items-center gap-1">
           <ng-icon name="heroExclamationCircle" size="12" />
-          Valid price is required.
+          Price is required.
+        </p>
+      }
+      @if (priceInput.touched && priceInput.errors?.['min']) {
+        <p class="mt-1 text-xs text-red-500 flex items-center gap-1">
+          <ng-icon name="heroExclamationCircle" size="12" />
+          Price must be greater than 0.
+        </p>
+      }
+      @if (priceInput.touched && priceInput.errors?.['max']) {
+        <p class="mt-1 text-xs text-red-500 flex items-center gap-1">
+          <ng-icon name="heroExclamationCircle" size="12" />
+          Price must be less than 1 000 000.
         </p>
       }
     </div>
 
-    @if (successMessage()) {
+    @if (state().alert?.type === 'success') {
       <div
         class="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm"
       >
         <ng-icon name="heroCheckCircle" size="16" class="mt-0.5 shrink-0" />
-        {{ successMessage() }}
+        {{ state().alert!.message }}
       </div>
     }
-    @if (errorMessage()) {
+    @if (state().alert?.type === 'error') {
       <div
         class="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm"
       >
         <ng-icon name="heroXCircle" size="16" class="mt-0.5 shrink-0" />
-        {{ errorMessage() }}
+        {{ state().alert!.message }}
       </div>
     }
 
     <button
       type="submit"
-      [disabled]="f.invalid || submitting()"
+      [disabled]="f.invalid || state().submitting"
       class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 shadow-sm shadow-blue-200 hover:from-blue-700 hover:to-indigo-700 active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
     >
-      @if (!submitting()) {
+      @if (!state().submitting) {
         <ng-icon name="heroPlus" size="16" />
       }
-      @if (submitting()) {
+      @if (state().submitting) {
         <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
           <circle
             class="opacity-25"
@@ -146,7 +173,7 @@
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
         </svg>
       }
-      {{ submitting() ? 'Adding...' : 'Add Product' }}
+      {{ state().submitting ? 'Adding...' : 'Add Product' }}
     </button>
   </form>
 </section>

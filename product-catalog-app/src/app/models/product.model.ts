@@ -1,3 +1,8 @@
+export type AlertState =
+  | { type: 'success'; message: string }
+  | { type: 'error'; message: string }
+  | null;
+
 export interface Product {
   id: string;
   code: string;

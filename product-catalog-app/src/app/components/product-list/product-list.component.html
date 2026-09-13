@@ -9,10 +9,10 @@
       <div>
         <h2 class="text-sm font-bold text-slate-700">All Products</h2>
         <p class="text-xs text-slate-400">
-          @if (!loading() && !error()) {
-            {{ products().length }} item{{ products().length !== 1 ? 's' : '' }}
+          @if (!state().loading && !state().alert) {
+            {{ state().products.length }} item{{ state().products.length !== 1 ? 's' : '' }}
           }
-          @if (loading()) {
+          @if (state().loading) {
             Loading...
           }
         </p>
@@ -27,7 +27,7 @@
     </button>
   </div>
 
-  @if (loading()) {
+  @if (state().loading) {
     <div class="py-16 flex flex-col items-center gap-3 text-slate-400">
       <svg class="w-8 h-8 animate-spin text-blue-400" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -37,17 +37,17 @@
     </div>
   }
 
-  @if (error()) {
+  @if (state().alert?.type === 'error') {
     <div class="py-16 flex flex-col items-center gap-3 text-red-400">
       <ng-icon name="heroExclamationCircle" size="40" />
-      <p class="text-sm font-medium">{{ error() }}</p>
+      <p class="text-sm font-medium">{{ state().alert!.message }}</p>
       <button (click)="loadProducts()" class="text-xs text-blue-500 hover:underline">
         Try again
       </button>
     </div>
   }
 
-  @if (!loading() && !error() && products().length === 0) {
+  @if (!state().loading && !state().alert && state().products.length === 0) {
     <div class="py-16 flex flex-col items-center gap-3 text-slate-300">
       <ng-icon name="heroCube" size="48" />
       <p class="text-sm font-medium text-slate-400">No products yet</p>
@@ -55,7 +55,7 @@
     </div>
   }
 
-  @if (!loading() && !error() && products().length > 0) {
+  @if (!state().loading && !state().alert && state().products.length > 0) {
     <div class="overflow-x-auto">
       <table class="w-full">
         <thead>
@@ -83,7 +83,7 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-50">
-          @for (product of products(); track product.id; let i = $index) {
+          @for (product of state().products; track product.id; let i = $index) {
             <tr app-product-row [product]="product" [index]="i"
                 class="group hover:bg-blue-50/40 transition-colors duration-100">
             </tr>

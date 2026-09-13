@@ -1,9 +1,10 @@
 import { Component, output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { NgIcon } from '@ng-icons/core';
 import { ProductService } from '../../services/product.service';
-import { CreateProductDto } from '../../models/product.model';
+import { AlertState, CreateProductDto } from '../../models/product.model';
 
 @Component({
   selector: 'app-product-form',
@@ -16,27 +17,39 @@ export class ProductFormComponent {
   private productService = inject(ProductService);
 
   model: CreateProductDto = { code: '', name: '', price: 0 };
-  submitting = signal(false);
-  successMessage = signal('');
-  errorMessage = signal('');
+  state = signal<{ submitting: boolean; alert: AlertState }>({
+    submitting: false,
+    alert: null,
+  });
+
+  private parseError(err: HttpErrorResponse): string {
+    if (err.status === 400 && err.error?.errors) {
+      return Object.values(err.error.errors as Record<string, string[]>).flat().join(' ');
+    }
+    if (err.status === 409 && err.error?.error) {
+      return err.error.error;
+    }
+    return 'Failed to add product. Please try again.';
+  }
 
   onSubmit(form: NgForm): void {
     if (!this.model.code || !this.model.name || this.model.price <= 0) return;
 
-    this.submitting.set(true);
-    this.successMessage.set('');
-    this.errorMessage.set('');
+    this.state.update(s => ({ ...s, submitting: true, alert: null }));
 
     this.productService.create(this.model).subscribe({
       next: () => {
-        this.successMessage.set(`Product "${this.model.name}" added successfully!`);
+        this.state.update(s => ({
+          ...s,
+          submitting: false,
+          alert: { type: 'success', message: `Product "${this.model.name}" added successfully!` },
+        }));
         form.resetForm({ code: '', name: '', price: 0 });
-        this.submitting.set(false);
         this.productAdded.emit();
       },
-      error: () => {
-        this.errorMessage.set('Failed to add product. Is the API running?');
-        this.submitting.set(false);
+      error: (err: HttpErrorResponse) => {
+        const message = this.parseError(err);
+        this.state.update(s => ({ ...s, submitting: false, alert: { type: 'error', message } }));
       },
     });
   }
