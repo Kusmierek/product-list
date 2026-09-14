@@ -43,7 +43,7 @@ export class ProductFormComponent {
         this.state.update(s => ({
           ...s,
           submitting: false,
-          alert: { type: 'success', message: `Product "${this.model.name}" added successfully!` },
+          alert: { type: 'success', message: `Product "${this.model.name.length > 50 ? this.model.name.slice(0, 50) + '…' : this.model.name}" added successfully!` },
         }));
         form.resetForm({ code: '', name: '', price: 0 });
         this.refreshService.trigger();

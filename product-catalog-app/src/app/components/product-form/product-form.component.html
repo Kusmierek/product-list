@@ -140,7 +140,7 @@
         class="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm"
       >
         <ng-icon name="heroCheckCircle" size="16" class="mt-0.5 shrink-0" />
-        {{ state().alert!.message }}
+        <span class="min-w-0 break-words">{{ state().alert!.message }}</span>
       </div>
     }
     @if (state().alert?.type === 'error') {
@@ -148,7 +148,7 @@
         class="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm"
       >
         <ng-icon name="heroXCircle" size="16" class="mt-0.5 shrink-0" />
-        {{ state().alert!.message }}
+        <span class="min-w-0 break-words">{{ state().alert!.message }}</span>
       </div>
     }
 

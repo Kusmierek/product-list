@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { provideIcons } from '@ng-icons/core';
 import {
@@ -13,7 +13,7 @@ import {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
-    provideHttpClient(),
+    provideHttpClient(withFetch()),
     provideRouter([]),
     provideIcons({
       heroPlus, heroTrash, heroPencil, heroArrowPath,

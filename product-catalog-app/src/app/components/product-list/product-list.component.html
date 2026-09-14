@@ -72,7 +72,14 @@
 
   @if (!state().loading && !state().alert && state().products.length > 0) {
     <div class="overflow-x-auto">
-      <table class="w-full">
+      <table class="w-full table-fixed">
+        <colgroup>
+          <col class="w-10" />
+          <col class="w-24" />
+          <col />
+          <col class="w-28" />
+          <col class="w-40" />
+        </colgroup>
         <thead>
           <tr class="bg-slate-50 border-b border-slate-100">
             <th
