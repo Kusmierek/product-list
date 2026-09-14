@@ -1,9 +1,10 @@
-import { Component, output, signal, inject } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NgIcon } from '@ng-icons/core';
 import { ProductService } from '../../services/product.service';
+import { ProductRefreshService } from '../../services/product-refresh.service';
 import { AlertState, CreateProductDto } from '../../models/product.model';
 
 @Component({
@@ -13,8 +14,8 @@ import { AlertState, CreateProductDto } from '../../models/product.model';
   styleUrl: './product-form.component.css',
 })
 export class ProductFormComponent {
-  readonly productAdded = output<void>();
-  private productService = inject(ProductService);
+  private readonly productService = inject(ProductService);
+  private readonly refreshService = inject(ProductRefreshService);
 
   model: CreateProductDto = { code: '', name: '', price: 0 };
   state = signal<{ submitting: boolean; alert: AlertState }>({
@@ -33,7 +34,7 @@ export class ProductFormComponent {
   }
 
   onSubmit(form: NgForm): void {
-    if (!this.model.code || !this.model.name || this.model.price <= 0) return;
+    if (form.invalid || this.state().submitting) return;
 
     this.state.update(s => ({ ...s, submitting: true, alert: null }));
 
@@ -45,7 +46,7 @@ export class ProductFormComponent {
           alert: { type: 'success', message: `Product "${this.model.name}" added successfully!` },
         }));
         form.resetForm({ code: '', name: '', price: 0 });
-        this.productAdded.emit();
+        this.refreshService.trigger();
       },
       error: (err: HttpErrorResponse) => {
         const message = this.parseError(err);

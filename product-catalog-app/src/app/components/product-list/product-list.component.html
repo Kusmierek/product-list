@@ -1,30 +1,45 @@
 <section class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
   <div
-    class="px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-blue-50 flex justify-between items-center"
+    class="px-6 py-4 border-b border-slate-100 bg-linear-to-r from-slate-50 to-blue-50 flex flex-col gap-3"
   >
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-        <ng-icon name="heroQueueList" color="white" size="16" />
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+          <ng-icon name="heroQueueList" color="white" size="22" />
+        </div>
+        <div>
+          <h2 class="text-sm font-bold text-slate-700">All Products</h2>
+          <p class="text-xs text-slate-400">
+            @if (!state().loading && !state().alert) {
+              {{ state().total }} item{{ state().total !== 1 ? 's' : '' }}
+            }
+            @if (state().loading) {
+              Loading...
+            }
+          </p>
+        </div>
       </div>
-      <div>
-        <h2 class="text-sm font-bold text-slate-700">All Products</h2>
-        <p class="text-xs text-slate-400">
-          @if (!state().loading && !state().alert) {
-            {{ state().products.length }} item{{ state().products.length !== 1 ? 's' : '' }}
-          }
-          @if (state().loading) {
-            Loading...
-          }
-        </p>
-      </div>
+      <button
+        (click)="loadProducts()"
+        class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-sm"
+      >
+        <ng-icon name="heroArrowPath" size="14" />
+        Refresh
+      </button>
     </div>
-    <button
-      (click)="loadProducts()"
-      class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all duration-150 shadow-sm"
-    >
-      <ng-icon name="heroArrowPath" size="14" />
-      Refresh
-    </button>
+
+    <div class="relative">
+      <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+        <ng-icon name="heroMagnifyingGlass" class="text-slate-300" size="16" />
+      </span>
+      <input
+        type="text"
+        [value]="searchInput()"
+        (input)="onSearchInput($event)"
+        placeholder="Search by code or name..."
+        class="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-xl bg-white outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100 text-slate-700 placeholder-slate-300 transition-all"
+      />
+    </div>
   </div>
 
   @if (state().loading) {
@@ -50,8 +65,8 @@
   @if (!state().loading && !state().alert && state().products.length === 0) {
     <div class="py-16 flex flex-col items-center gap-3 text-slate-300">
       <ng-icon name="heroCube" size="48" />
-      <p class="text-sm font-medium text-slate-400">No products yet</p>
-      <p class="text-xs text-slate-300">Add your first product using the form.</p>
+      <p class="text-sm font-medium text-slate-400">No products found</p>
+      <p class="text-xs text-slate-300">Try adjusting your search.</p>
     </div>
   }
 
@@ -71,25 +86,68 @@
               Code
             </th>
             <th
-              class="text-left px-6 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider"
+              class="text-left px-6 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-600 select-none"
+              (click)="onSort('Name')"
             >
-              Name
+              <div class="flex items-center gap-1">
+                Name <ng-icon [name]="sortIcons().Name" size="12" />
+              </div>
             </th>
             <th
-              class="text-right px-6 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider"
+              class="text-right px-6 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-600 select-none"
+              (click)="onSort('Price')"
             >
-              Price
+              <div class="flex items-center justify-end gap-1">
+                Price <ng-icon [name]="sortIcons().Price" size="12" />
+              </div>
+            </th>
+            <th
+              class="text-right px-6 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider cursor-pointer hover:text-slate-600 select-none"
+              (click)="onSort('CreatedAt')"
+            >
+              <div class="flex items-center justify-end gap-1">
+                Created <ng-icon [name]="sortIcons().CreatedAt" size="12" />
+              </div>
             </th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-50">
           @for (product of state().products; track product.id; let i = $index) {
-            <tr app-product-row [product]="product" [index]="i"
-                class="group hover:bg-blue-50/40 transition-colors duration-100">
-            </tr>
+            <tr
+              app-product-row
+              [product]="product"
+              [index]="(state().query.page - 1) * state().query.pageSize + i"
+              class="group hover:bg-blue-50/40 transition-colors duration-100"
+            ></tr>
           }
         </tbody>
       </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+      <p class="text-xs text-slate-400">
+        {{ paginationRange().from }}–{{ paginationRange().to }} of {{ paginationRange().total }}
+      </p>
+      <div class="flex items-center gap-1">
+        <button
+          (click)="onPage(state().query.page - 1)"
+          [disabled]="state().query.page === 1"
+          class="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          <ng-icon name="heroChevronLeft" size="14" />
+        </button>
+        <span class="px-3 text-xs text-slate-600 font-medium">
+          {{ state().query.page }} / {{ totalPages() }}
+        </span>
+        <button
+          (click)="onPage(state().query.page + 1)"
+          [disabled]="state().query.page >= totalPages()"
+          class="p-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          <ng-icon name="heroChevronRight" size="14" />
+        </button>
+      </div>
     </div>
   }
 </section>

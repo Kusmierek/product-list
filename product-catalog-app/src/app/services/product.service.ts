@@ -1,16 +1,25 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Product, CreateProductDto } from '../models/product.model';
+import { Product, CreateProductDto, ProductQuery, PagedResult } from '../models/product.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
+  private readonly http = inject(HttpClient);
   private readonly apiUrl = 'http://localhost:5000/api/products';
 
-  constructor(private http: HttpClient) {}
+  getAll(query: ProductQuery): Observable<PagedResult<Product>> {
+    let params = new HttpParams()
+      .set('page', query.page)
+      .set('pageSize', query.pageSize)
+      .set('sortBy', query.sortBy)
+      .set('sortDir', query.sortDir);
 
-  getAll(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.apiUrl);
+    if (query.search) {
+      params = params.set('search', query.search);
+    }
+
+    return this.http.get<PagedResult<Product>>(this.apiUrl, { params });
   }
 
   create(dto: CreateProductDto): Observable<Product> {

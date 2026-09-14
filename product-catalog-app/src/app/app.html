@@ -6,19 +6,7 @@
       <div
         class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-md"
       >
-        <svg
-          class="w-5 h-5 text-white"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"
-          />
-        </svg>
+        <ng-icon name="heroCube" color="white" size="20" />
       </div>
       <div>
         <h1 class="text-base font-bold text-slate-800 leading-tight">Product Catalog</h1>
@@ -29,7 +17,7 @@
 
   <main class="max-w-6xl mx-auto px-6 py-10">
     <div class="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-8 items-start">
-      <app-product-form (productAdded)="onProductAdded()"></app-product-form>
+      <app-product-form></app-product-form>
       <app-product-list></app-product-list>
     </div>
   </main>
