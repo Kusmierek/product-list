@@ -35,7 +35,7 @@ docker-compose up --build
 - Frontend: `http://localhost:4200`
 - API: `http://localhost:5000`
 
-nginx proxy'uje `/api` do kontenera backendu — Angular nie potrzebuje publicznego adresu API.
+nginx proxy'uje `/api` do kontenera backendu Angular nie potrzebuje publicznego adresu API.
 
 ## Testy (BE)
 
