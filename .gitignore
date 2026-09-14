@@ -13,3 +13,4 @@ product-catalog-app/.angular/
 # General
 .DS_Store
 Thumbs.db
+.idea/
