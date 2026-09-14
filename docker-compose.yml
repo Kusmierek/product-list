@@ -1,0 +1,12 @@
+services:
+  api:
+    build: ./ProductCatalog.API
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build: ./product-catalog-app
+    ports:
+      - "4200:80"
+    depends_on:
+      - api
